@@ -214,7 +214,7 @@ abstract class LazyModule()(implicit val p: Parameters) {
           buf ++= s"""<y:Arrows source=\"none\" target=\"standard\"/>"""
         }
         buf ++= s"""<y:LineStyle color=\"$colour\" type=\"line\" width=\"1.0\"/>"""
-        buf ++= s"""<y:EdgeLabel modelName=\"centered\" rotationAngle=\"270.0\">$label</y:EdgeLabel>"""
+        buf ++= s"""<y:EdgeLabel modelName=\"centered\" fontFamily=\"BlexMono NFM\" rotationAngle=\"270.0\">$label</y:EdgeLabel>"""
         buf ++= s"""</y:PolyLineEdge></data></edge>\n"""
       }
     }
