@@ -153,7 +153,10 @@ abstract class LazyModule()(implicit val p: Parameters) {
     buf ++= "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\" xmlns:y=\"http://www.yworks.com/xml/graphml\">\n"
     buf ++= "  <key for=\"node\" id=\"n\" yfiles.type=\"nodegraphics\"/>\n"
     buf ++= "  <key for=\"edge\" id=\"e\" yfiles.type=\"edgegraphics\"/>\n"
-    buf ++= "  <key for=\"node\" id=\"d\" attr.name=\"Description\" attr.type=\"string\"/>\n"
+    buf ++= "  <key for=\"node\" id=\"nd\" attr.name=\"Description\" attr.type=\"string\"/>\n"
+    buf ++= "  <key for=\"edge\" id=\"ed\" attr.name=\"Description\" attr.type=\"string\"/>\n"
+    buf ++= "  <key for=\"node\" id=\"nurl\" attr.name=\"url\" attr.type=\"string\" />\n"
+    buf ++= "  <key for=\"edge\" id=\"eurl\" attr.name=\"url\" attr.type=\"string\" />\n"
     buf ++= "  <graph id=\"G\" edgedefault=\"directed\">\n"
     nodesGraphML(buf, "    ")
     edgesGraphML(buf, "    ")
@@ -176,12 +179,12 @@ abstract class LazyModule()(implicit val p: Parameters) {
   private def nodesGraphML(buf: StringBuilder, pad: String): Unit = {
     buf ++= s"""$pad<node id=\"$index\">\n"""
     buf ++= s"""$pad  <data key=\"n\"><y:ShapeNode><y:NodeLabel modelName=\"sides\" modelPosition=\"w\" rotationAngle=\"270.0\">$instanceName</y:NodeLabel><y:BorderStyle type=\"${if (shouldBeInlined) "dotted" else "line"}\"/></y:ShapeNode></data>\n"""
-    buf ++= s"""$pad  <data key=\"d\">$moduleName ($pathName)</data>\n"""
+    buf ++= s"""$pad  <data key=\"nd\">$moduleName ($pathName)</data>\n"""
     buf ++= s"""$pad  <graph id=\"$index::\" edgedefault=\"directed\">\n"""
     nodes.filter(!_.omitGraphML).foreach { n =>
       buf ++= s"""$pad    <node id=\"$index::${n.index}\">\n"""
       buf ++= s"""$pad      <data key=\"n\"><y:ShapeNode><y:Shape type="ellipse"/><y:Fill color="#FFCC00" transparent=\"${n.circuitIdentity}\"/></y:ShapeNode></data>\n"""
-      buf ++= s"""$pad      <data key=\"d\">${n.formatNode}, \n${n.nodedebugstring}</data>\n"""
+      buf ++= s"""$pad      <data key=\"nd\">${n.formatNode}, \n${n.nodedebugstring}</data>\n"""
       buf ++= s"""$pad    </node>\n"""
     }
     children.filter(!_.omitGraphML).foreach(_.nodesGraphML(buf, pad + "    "))
@@ -197,7 +200,7 @@ abstract class LazyModule()(implicit val p: Parameters) {
   private def edgesGraphML(buf: StringBuilder, pad: String): Unit = {
     nodes.filter(!_.omitGraphML) foreach { n =>
       n.outputs.filter(!_._1.omitGraphML).foreach { case (o, edge) =>
-        val RenderedEdge(colour, label, flipped) = edge
+        val RenderedEdge(colour, label, info, url, flipped) = edge
         buf ++= pad
         buf ++= "<edge"
         if (flipped) {
@@ -207,6 +210,8 @@ abstract class LazyModule()(implicit val p: Parameters) {
           buf ++= s""" source=\"$index::${n.index}\""""
           buf ++= s""" target=\"${o.lazyModule.index}::${o.index}\">"""
         }
+        buf ++= s"""<data key=\"ed\">$info</data>\n"""
+        buf ++= s"""<data key=\"eurl\">$url</data>\n"""
         buf ++= s"""<data key=\"e\"><y:PolyLineEdge>"""
         if (flipped) {
           buf ++= s"""<y:Arrows source=\"standard\" target=\"none\"/>"""
@@ -214,7 +219,7 @@ abstract class LazyModule()(implicit val p: Parameters) {
           buf ++= s"""<y:Arrows source=\"none\" target=\"standard\"/>"""
         }
         buf ++= s"""<y:LineStyle color=\"$colour\" type=\"line\" width=\"1.0\"/>"""
-        buf ++= s"""<y:EdgeLabel modelName=\"centered\" fontFamily=\"BlexMono NFM\" rotationAngle=\"270.0\">$label</y:EdgeLabel>"""
+        buf ++= s"""<y:EdgeLabel alignment=\"left\" modelName=\"centered\" fontFamily=\"BlexMono NFM\" rotationAngle=\"270.0\">$label</y:EdgeLabel>"""
         buf ++= s"""</y:PolyLineEdge></data></edge>\n"""
       }
     }

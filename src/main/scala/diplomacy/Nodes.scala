@@ -26,6 +26,8 @@ case object RenderFlipped extends Field[Boolean](false)
 case class RenderedEdge(
   colour:  String,
   label:   String  = "",
+  info:    String = "",
+  link:    String = "",
   flipped: Boolean = false)
 
 /** [[InwardNodeImp]] defines the types that describe the inward side of the [[BaseNode]].
