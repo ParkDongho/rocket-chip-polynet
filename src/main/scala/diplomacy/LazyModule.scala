@@ -247,6 +247,9 @@ abstract class LazyModule()(implicit val p: Parameters) {
   /** Accessor for [[children]]. */
   def getChildren: List[LazyModule] = children
 
+  /** Accessor for [[parent]]. */
+  def getParent: Option[LazyModule] = parent
+
   /** Accessor for [[nodes]]. */
   def getNodes: List[BaseNode] = nodes
 }
